@@ -5,18 +5,28 @@
 
 Подключите библиотеку gtest:
 ![image](https://github.com/lepeha81/lab05n/blob/main/1.PNG)
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/2.PNG)
+
 Создайте CMakeLists.txt для банковских операций:
 ![image](https://github.com/lepeha81/lab05n/blob/main/3.PNG)
 
 Содержимое файла CMakeLists.txt:
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/4.PNG)
+
 Создаём CMakeLists.txt для:tests
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/5.PNG)
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/6.PNG)
+
 Содержимое файла CMakeLists.txt:
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/7.PNG)
+
 # Task 2
+
 Создайте модульные тесты на классы `Transaction` и `Account`
 - Используйте mock-объекты
 - Покрытие кода должно составлять 100%
@@ -98,15 +108,18 @@ TEST(Transaction, SimpleTest) {
     EXPECT_FALSE(tr.Make(ac2, ac1, 300));
 }
 ```
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/8.PNG)
 
 # Task 3 
 Настройте сборочную процедуру на TravisCI
 
 Сделаем`.yml` file:
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/9.PNG)
 
 Содержимое файла Action.yml:
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/10.PNG)
 
 
@@ -114,9 +127,13 @@ TEST(Transaction, SimpleTest) {
 Настройте Coveralls.io
 
 Изменим CMakeLists.txt :
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/11.PNG)
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/12.PNG)
 
 Новое содержимое файла Action.ymk:
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/13.PNG)
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/14.PNG)
