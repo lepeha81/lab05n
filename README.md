@@ -63,44 +63,63 @@ include_directories()
 
 ![image](https://github.com/lepeha81/lab05n/blob/main/7.PNG)
 
-Конечно!
 
 ```
-project(banking_lib)
+cmake_minimum_required(VERSION 3.4)
 ```
 
-Эта строка определяет имя проекта. Обычно это название папки, содержащей исходный код проекта. Имя проекта нужно для того, чтобы можно было однозначно идентифицировать проект при его сборке, установке и использовании.
+Эта строка задает минимальную версию CMake, которая требуется для сборки проекта.
 
 ```
-if (NOT TARGET libbanking)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ```
 
-Эта строка проверяет, существует ли уже цель `libbanking`. Если ее еще нет, то будет выполнен блок внутри условия. Это нужно для того, чтобы не создавать цель повторно, если она уже была создана.
+Эти две строки задают стандарт языка C++ для компиляции проекта и устанавливают флаг, который гарантирует, что этот стандарт будет использоваться, если он доступен.
 
 ```
-add_library(libbanking STATIC
-    /Account.cpp
-    /Transaction.cpp
-)
+option(BUILD_TEST "Build tests" OFF)
 ```
 
-Эта строка добавляет цель `libbanking` - это произвольное имя, которое будет использоваться для ссылки на библиотеку в других целях. Задается тип цели `STATIC`, что означает создание статической библиотеки. Далее указывается список исходных файлов, входящих в эту библиотеку. В данном случае это два файла: `Account.cpp` и `Transaction.cpp`.
+Эта строка добавляет параметр сборки `BUILD_TEST`, который позволяет включить или выключить сборку тестов проекта. По умолчанию он выключен.
 
 ```
-install(TARGETS libbanking
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-)
+project(banking)
 ```
 
-Эта строка добавляет инструкцию установки цели `libbanking`, которая была создана выше. Для этого вызывается команда `install`. С помощью аргумента `TARGETS` указывается цель, которая должна быть установлена. Далее используются два параметра: `ARCHIVE DESTINATION lib` и `LIBRARY DESTINATION lib`. Они указывают, куда будет скопирована установка. Архив будет скопирован в папку `lib`, которая находится в каталоге установки, а точнее - в `/usr/local/lib` на Unix-подобных системах. 
+Эта строка задает имя проекта.
 
 ```
-include_directories()
+add_library(banking STATIC banking/Account.cpp banking/Transaction.cpp)
 ```
 
-Эта строка объявляет пути к папкам, содержащим заголовочные файлы, которые должны быть доступны для использования функциям и классам, которые были объявлены в исходных файлах проекта. Пути могут быть указаны в любом количестве внутри круглых скобок.
+Эта строка создает статическую библиотеку `banking`, которая будет содержать код, написанный в файлах `banking/Account.cpp` и `banking/Transaction.cpp`.
 
+```
+target_include_directories(banking PUBLIC banking/)
+```
+
+Эта строка указывает, что библиотека `banking` должна включать путь `banking/` в список путей, где будет искаться заголовочные файлы.
+
+```
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(third-party/gtest)
+  file(GLOB BANKING_TEST_SOURCES tests/tests.cpp)
+  add_executable(check tests/tests.cpp)
+  target_link_libraries(check banking gtest_main gmock_main)
+  add_test(NAME check COMMAND check)
+endif()
+```
+
+Этот блок определяет процесс сборки тестов проекта. Если параметр `BUILD_TEST` установлен в значение `ON`, то будут выполнены следующие действия: 
+
+- `enable_testing()` - включает подсистему тестирования CTest. 
+- `add_subdirectory(third-party/gtest)` - добавляет каталог с библиотекой Google Test в процесс сборки.
+- `file(GLOB BANKING_TEST_SOURCES tests/tests.cpp)` - создает переменную `BANKING_TEST_SOURCES`, содержащую список исходных файлов тестов. В данном случае это файл `tests/tests.cpp`.
+- `add_executable(check tests/tests.cpp)` - создает цель с именем `check`, которая будет компилироваться из файла `tests/tests.cpp` и других файлов, необходимых для тестирования. 
+- `target_link_libraries(check banking gtest_main gmock_main)` - связывает бинарник тестов с библиотеками Google Test и `banking`.
+- `add_test(NAME check COMMAND check)` - добавляет тест с именем `check`.
 # Task 2
 
 Создайте модульные тесты на классы `Transaction` и `Account`
