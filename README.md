@@ -325,3 +325,75 @@ TEST(Transaction, SimpleTest) {
 ![image](https://github.com/lepeha81/lab05n/blob/main/13.PNG)
 
 ![image](https://github.com/lepeha81/lab05n/blob/main/14.PNG)
+
+Первоначально мы имеем название проекта - `CMake`, а затем следует секция `on`, где описаны события, на которые реагирует данный workflow - `push` и `pull_request` ветки `master`.
+
+Далее идет блок `jobs`, который содержит одну задачу - `build_Linux`. Названия задач могут быть выбраны произвольно.
+
+```
+ build_Linux:
+  runs-on: ubuntu-latest
+```
+
+Задача будет запущена на последней версии Ubuntu.
+
+```
+  steps:
+  - uses: actions/checkout@v3
+```
+
+Данный шаг использует действие `checkout`, чтобы склонировать репозиторий текущего проекта.
+
+```
+  - name: Adding gtest
+    run: git clone https://github.com/google/googletest.git third-party/gtest -b release-1.11.0
+```
+
+Данный шаг клонирует репозиторий Google Test в каталог `third-party/gtest`.
+
+```
+  - name: Install lcov
+    run: sudo apt-get install -y lcov
+```
+
+Данный шаг устанавливает lcov.
+
+```
+  - name: Config banking with tests
+    run: cmake -H. -B ${{github.workspace}}/build -DBUILD_TESTS=ON
+```
+
+Данный шаг настраивает сборку проекта с тестами, используя CMake. Опция `-H.` указывает на расположение файла CMakeLists.txt в корне проекта, `-B ${{github.workspace}}/build` указывает на путь к каталогу сборки, а опция `-DBUILD_TESTS=ON` включает сборку тестов.
+
+```
+  - name: Build banking
+    run: cmake --build ${{github.workspace}}/build
+```
+
+Этот шаг запускает команду `cmake --build` для сборки проекта.
+
+```
+  - name: Run tests
+    run: |
+      build/check
+      cmake --build ${{github.workspace}}/build --target test -- ARGS=--verbose
+```
+
+Этот шаг позволяет запустить все тесты из предыдущего шага. Обратите внимание, что здесь используются две команды в блоке `run`.
+
+```
+  - name: Do lcov stuff
+    run: lcov -c -d build/CMakeFiles/banking.dir/banking/ --include *.cpp --output-file ./coverage/lcov.info
+```
+
+Данный шаг использует инструмент lcov для генерации отчета о покрытии кода тестами.
+
+```
+  - name: Publish to coveralls.io
+    uses: coverallsapp/github-action@v1.1.2
+    with:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Этот шаг позволяет отправить данные о покрытии на сервис Coveralls, чтобы можно было отслеживать процент покрытия кода тестами. Здесь используется дополнительное действие с загрузкой из общедоступного репозитория - `coverallsapp/github-action@v1.1.2`.
+
