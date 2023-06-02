@@ -318,6 +318,11 @@ TEST(Transaction, SimpleTest) {
 
 ![image](https://github.com/lepeha81/lab05n/blob/main/11.PNG)
 
+if (COVERAGE)
+    target_compile_options(check PRIVATE --coverage)
+    target_link_libraries(check --coverage)
+Этот блок кода проверяет, была ли определена переменная COVERAGE, которая используется для измерения покрытия кода тестами. Если эта переменная существует, то опции компилятора и библиотеки выбираются так, чтобы генерировать отчет о покрытии кода.
+
 ![image](https://github.com/lepeha81/lab05n/blob/main/12.PNG)
 
 Новое содержимое файла Action.ymk:
